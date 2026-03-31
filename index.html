@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>GOGAGYM — Fitness App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <!-- ФОН -->
+    <div class="bg-grunge"></div>
+    <div class="bg-particles" id="particles"></div>
+    <div class="bg-vignette"></div>
+    
+    <!-- ОНБОРДИНГ -->
+    <div id="onboarding" class="onboarding" style="display: none;">
+        <div class="onboarding-content">
+            <div class="onboarding-logo">
+                <span class="logo-big">GOGA<span class="text-red">GYM</span></span>
+            </div>
+            <h1 class="onboarding-title">ТВОЙ ПУТЬ ВОИНА НАЧИНАЕТСЯ</h1>
+            <p class="onboarding-desc">Персональный тренер в твоём кармане</p>
+            
+            <div class="onboarding-form">
+                <div class="form-group">
+                    <label>🎯 ТВОЯ ЦЕЛЬ</label>
+                    <select id="onboard-goal">
+                        <option value="burn">🔥 Сжигание жира</option>
+                        <option value="gain">💪 Набор массы</option>
+                        <option value="strength">🏋️ Сила</option>
+                        <option value="relief">⚡ Рельеф</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>📍 ГДЕ ТРЕНИРУЕШЬСЯ</label>
+                    <div class="place-selector">
+                        <button class="place-btn" data-place="gym" onclick="selectPlace('gym')">
+                            <span class="place-icon">🏋️</span>
+                            <span>В ЗАЛЕ</span>
+                        </button>
+                        <button class="place-btn" data-place="home" onclick="selectPlace('home')">
+                            <span class="place-icon">🏠</span>
+                            <span>ДОМА</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>⚖️ ПАРАМЕТРЫ</label>
+                    <div class="params-row">
+                        <input type="number" id="onboard-weight" placeholder="Вес (кг)">
+                        <input type="number" id="onboard-height" placeholder="Рост (см)">
+                        <input type="number" id="onboard-age" placeholder="Возраст">
+                    </div>
+                </div>
+                
+                <button class="btn-onboard" onclick="completeOnboarding()">
+                    <span>🚀 НАЧАТЬ ПУТЬ</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
+    <div id="app" class="app-container" style="display: none;">
+        
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo-small">GOGA<span class="text-red">GYM</span></div>
+            </div>
+            <div class="header-center">
+                <div class="streak-badge" onclick="showScreen('screen-home')">
+                    <span class="streak-icon">🔥</span>
+                    <span class="streak-count" id="header-streak">0</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="profile-btn" onclick="showScreen('screen-profile')">
+                    <span class="profile-avatar" id="profile-avatar">👤</span>
+                </button>
+            </div>
+        </header>
+        
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            
+            <!-- ГЛАВНАЯ -->
+            <section id="screen-home" class="screen active">
+                <!-- Приветствие -->
+                <div class="greeting-card">
+                    <h1 class="greeting-title" id="greeting-title">С НОВЫМ ДНЁМ, ВОИН</h1>
+                    <p class="greeting-subtitle" id="greeting-subtitle">Готов к тренировке?</p>
+                </div>
+                
+                <!-- Быстрый старт -->
+                <div class="quick-start">
+                    <button class="quick-start-btn" onclick="quickWorkout()">
+                        <span class="quick-icon">⚡</span>
+                        <span class="quick-text">БЫСТРАЯ<br>ТРЕНИРОВКА</span>
+                    </button>
+                </div>
+                
+                <!-- Прогресс цели -->
+                <div class="goal-progress-card" onclick="showScreen('screen-programs')">
+                    <div class="goal-progress-header">
+                        <span class="goal-progress-label">🎯 ТВОЯ ЦЕЛЬ</span>
+                        <span class="goal-progress-value" id="goal-progress-value">--</span>
+                    </div>
+                    <div class="progress-bar-large">
+                        <div class="progress-fill-large" id="goal-progress-bar" style="width: 0%"></div>
+                    </div>
+                    <p class="goal-progress-desc">Нажми чтобы продолжить</p>
+                </div>
+                
+                <!-- Статистика за неделю -->
+                <div class="week-stats-card">
+                    <h3 class="card-title">📊 ЭТА НЕДЕЛЯ</h3>
+                    <div class="week-stats-grid">
+                        <div class="week-stat">
+                            <span class="week-stat-value" id="week-workouts">0</span>
+                            <span class="week-stat-label">Тренировок</span>
+                        </div>
+                        <div class="week-stat">
+                            <span class="week-stat-value" id="week-calories">0</span>
+                            <span class="week-stat-label">Ккал</span>
+                        </div>
+                        <div class="week-stat">
+                            <span class="week-stat-value" id="week-minutes">0</span>
+                            <span class="week-stat-label">Минут</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Последние достижения -->
+                <div class="achievements-card">
+                    <div class="card-header">
+                        <h3 class="card-title">🏆 ДОСТИЖЕНИЯ</h3>
+                        <span class="card-link" onclick="showScreen('screen-achievements')">Все →</span>
+                    </div>
+                    <div class="achievements-mini" id="achievements-mini"></div>
+                </div>
+            </section>
+            
+            <!-- ПРОГРАММЫ -->
+            <section id="screen-programs" class="screen">
+                <div class="screen-header">
+                    <h1 class="screen-title">ПРОГРАММЫ</h1>
+                    <p class="screen-subtitle">Выбери программу тренировок</p>
+                </div>
+                
+                <div class="programs-tabs">
+                    <button class="tab-btn active" data-tab="all" onclick="filterPrograms('all')">Все</button>
+                    <button class="tab-btn" data-tab="beginner" onclick="filterPrograms('beginner')">Новичок</button>
+                    <button class="tab-btn" data-tab="intermediate" onclick="filterPrograms('intermediate')">Средний</button>
+                    <button class="tab-btn" data-tab="advanced" onclick="filterPrograms('advanced')">Профи</button>
+                </div>
+                
+                <div class="programs-grid" id="programs-grid"></div>
+            </section>
+            
+            <!-- ТРЕНИРОВКА -->
+            <section id="screen-workout" class="screen">
+                <div class="workout-header-fixed">
+                    <button class="btn-back" onclick="quitWorkout()">✕</button>
+                    <h2 class="workout-title" id="workout-title">ТРЕНИРОВКА</h2>
+                    <div class="workout-timer-mini" id="workout-timer-mini">00:00</div>
+                </div>
+                
+                <div class="workout-content">
+                    <!-- Разминка -->
+                    <div class="workout-phase" id="phase-warmup">
+                        <div class="phase-badge">🔥 РАЗМИНКА</div>
+                        <h3 class="phase-title">Подготовь тело</h3>
+                        <div class="warmup-exercises" id="warmup-list"></div>
+                        <button class="btn-phase-complete" onclick="startMainWorkout()">
+                            <span>✅ ГОТОВ К ТРЕНИРОВКЕ</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Основная -->
+                    <div class="workout-phase" id="phase-main" style="display: none;">
+                        <div class="exercise-card-active">
+                            <div class="exercise-number">УПРАЖНЕНИЕ <span id="exercise-num">1</span>/<span id="exercise-total">8</span></div>
+                            <div class="exercise-icon-large" id="exercise-icon-large">🏋️</div>
+                            <h3 class="exercise-title-large" id="exercise-title">ЖИМ ШТАНГИ ЛЁЖА</h3>
+                            <div class="exercise-sets-display" id="exercise-sets-display">4 подхода × 8-12 повторений</div>
+                            
+                            <!-- Ввод весов -->
+                            <div class="weight-input-section">
+                                <label class="weight-label">💾 РАБОЧИЙ ВЕС (кг)</label>
+                                <div class="weight-inputs">
+                                    <input type="number" id="set-1-weight" placeholder="Подход 1" class="weight-input">
+                                    <input type="number" id="set-2-weight" placeholder="Подход 2" class="weight-input">
+                                    <input type="number" id="set-3-weight" placeholder="Подход 3" class="weight-input">
+                                    <input type="number" id="set-4-weight" placeholder="Подход 4" class="weight-input">
+                                </div>
+                            </div>
+                            
+                            <div class="exercise-timer">
+                                <div class="timer-circle" id="timer-circle">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle class="timer-bg" cx="50" cy="50" r="45"></circle>
+                                        <circle class="timer-progress" id="timer-progress" cx="50" cy="50" r="45"></circle>
+                                    </svg>
+                                    <span class="timer-text" id="timer-text">60</span>
+                                </div>
+                                <p class="timer-label">Отдых</p>
+                            </div>
+                            
+                            <div class="exercise-description" id="exercise-description">
+                                Лягте на скамью, стопы на полу. Хват чуть шире плеч...
+                            </div>
+                        </div>
+                        
+                        <div class="workout-actions">
+                            <button class="btn-action-secondary" onclick="skipExercise()">
+                                <span>⏭️ ПРОПУСТИТЬ</span>
+                            </button>
+                            <button class="btn-action-primary" onclick="completeExercise()">
+                                <span>✅ ВЫПОЛНЕНО</span>
+                            </button>
+                        </div>
+                        
+                        <div class="workout-progress-large">
+                            <div class="progress-bar-large">
+                                <div class="progress-fill-large" id="workout-progress" style="width: 10%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Заминка -->
+                    <div class="workout-phase" id="phase-cooldown" style="display: none;">
+                        <div class="phase-badge">🧘 ЗАМИНКА</div>
+                        <h3 class="phase-title">Восстановление</h3>
+                        <div class="cooldown-exercises" id="cooldown-list"></div>
+                        <button class="btn-phase-complete" onclick="finishWorkout()">
+                            <span>🏆 ЗАВЕРШИТЬ ТРЕНИРОВКУ</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ПРОФИЛЬ -->
+            <section id="screen-profile" class="screen">
+                <div class="profile-header">
+                    <div class="profile-avatar-large" id="profile-avatar-large">👤</div>
+                    <h2 class="profile-name" id="profile-name">ВОИН</h2>
+                    <p class="profile-level">Уровень <span id="profile-level-num">1</span></p>
+                    <div class="profile-xp">
+                        <div class="xp-bar">
+                            <div class="xp-fill" style="width: 30%"></div>
+                        </div>
+                        <span class="xp-text" id="xp-text">300/1000 XP</span>
+                    </div>
+                </div>
+                
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <span class="profile-stat-value" id="profile-total-workouts">0</span>
+                        <span class="profile-stat-label">Всего тренировок</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="profile-stat-value" id="profile-total-calories">0</span>
+                        <span class="profile-stat-label">Ккал сожжено</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="profile-stat-value" id="profile-best-streak">0</span>
+                        <span class="profile-stat-label">Лучшая серия</span>
+                    </div>
+                </div>
+                
+                <div class="profile-menu">
+                    <button class="profile-menu-item" onclick="showScreen('screen-progress')">
+                        <span class="menu-icon">📊</span>
+                        <span>Мой прогресс</span>
+                        <span class="menu-arrow">→</span>
+                    </button>
+                    <button class="profile-menu-item" onclick="showScreen('screen-weights')">
+                        <span class="menu-icon">🏋️</span>
+                        <span>Рабочие веса</span>
+                        <span class="menu-arrow">→</span>
+                    </button>
+                    <button class="profile-menu-item" onclick="showScreen('screen-nutrition')">
+                        <span class="menu-icon">🍗</span>
+                        <span>Питание</span>
+                        <span class="menu-arrow">→</span>
+                    </button>
+                    <button class="profile-menu-item" onclick="showScreen('screen-sleep')">
+                        <span class="menu-icon">😴</span>
+                        <span>Сон</span>
+                        <span class="menu-arrow">→</span>
+                    </button>
+                    <button class="profile-menu-item" onclick="showScreen('screen-achievements')">
+                        <span class="menu-icon">🏆</span>
+                        <span>Достижения</span>
+                        <span class="menu-arrow">→</span>
+                    </button>
+                    <button class="profile-menu-item" onclick="showScreen('screen-settings')">
+                        <span class="menu-icon">⚙️</span>
+                        <span>Настройки</span>
+                        <span class="menu-arrow">→</span>
+                    </button>
+                </div>
+            </section>
+            
+            <!-- ПРОГРЕСС -->
+            <section id="screen-progress" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="showScreen('screen-profile')">←</button>
+                    <h1 class="screen-title">МОЙ ПРОГРЕСС</h1>
+                </div>
+                
+                <div class="measurements-grid-large">
+                    <div class="measurement-card-large">
+                        <span class="measurement-icon">⚖️</span>
+                        <span class="measurement-label">ВЕС</span>
+                        <span class="measurement-value-large" id="measure-weight">--</span>
+                        <span class="measurement-unit">кг</span>
+                    </div>
+                    <div class="measurement-card-large">
+                        <span class="measurement-icon">📏</span>
+                        <span class="measurement-label">ГРУДЬ</span>
+                        <span class="measurement-value-large" id="measure-chest">--</span>
+                        <span class="measurement-unit">см</span>
+                    </div>
+                    <div class="measurement-card-large">
+                        <span class="measurement-icon">📏</span>
+                        <span class="measurement-label">ТАЛИЯ</span>
+                        <span class="measurement-value-large" id="measure-waist">--</span>
+                        <span class="measurement-unit">см</span>
+                    </div>
+                    <div class="measurement-card-large">
+                        <span class="measurement-icon">📏</span>
+                        <span class="measurement-label">БЁДРА</span>
+                        <span class="measurement-value-large" id="measure-hips">--</span>
+                        <span class="measurement-unit">см</span>
+                    </div>
+                    <div class="measurement-card-large">
+                        <span class="measurement-icon">💪</span>
+                        <span class="measurement-label">БИЦЕПС</span>
+                        <span class="measurement-value-large" id="measure-biceps">--</span>
+                        <span class="measurement-unit">см</span>
+                    </div>
+                    <div class="measurement-card-large">
+                        <span class="measurement-icon">🦵</span>
+                        <span class="measurement-label">ИКРЫ</span>
+                        <span class="measurement-value-large" id="measure-calves">--</span>
+                        <span class="measurement-unit">см</span>
+                    </div>
+                </div>
+                
+                <button class="btn-primary-large" onclick="showScreen('screen-add-progress')">
+                    <span>📝 ЗАПИСАТЬ ДАННЫЕ</span>
+                </button>
+                
+                <div class="history-section">
+                    <h3 class="section-title">📅 ИСТОРИЯ ЗАМЕРОВ</h3>
+                    <div class="history-list" id="progress-history"></div>
+                </div>
+            </section>
+            
+            <!-- ДОБАВИТЬ ПРОГРЕСС -->
+            <section id="screen-add-progress" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="showScreen('screen-progress')">←</button>
+                    <h1 class="screen-title">НОВЫЕ ДАННЫЕ</h1>
+                </div>
+                
+                <form class="progress-form" id="progress-form" onsubmit="saveProgress(event)">
+                    <div class="form-group">
+                        <label>⚖️ ВЕС (кг)</label>
+                        <input type="number" step="0.1" id="input-weight" placeholder="75.5">
+                    </div>
+                    <div class="form-group">
+                        <label>📏 ГРУДЬ (см)</label>
+                        <input type="number" step="0.1" id="input-chest" placeholder="100">
+                    </div>
+                    <div class="form-group">
+                        <label>📏 ТАЛИЯ (см)</label>
+                        <input type="number" step="0.1" id="input-waist" placeholder="80">
+                    </div>
+                    <div class="form-group">
+                        <label>📏 БЁДРА (см)</label>
+                        <input type="number" step="0.1" id="input-hips" placeholder="95">
+                    </div>
+                    <div class="form-group">
+                        <label>💪 БИЦЕПС (см)</label>
+                        <input type="number" step="0.1" id="input-biceps" placeholder="35">
+                    </div>
+                    <div class="form-group">
+                        <label>🦵 ИКРЫ (см)</label>
+                        <input type="number" step="0.1" id="input-calves" placeholder="40">
+                    </div>
+                    <button type="submit" class="btn-primary-large">
+                        <span>💾 СОХРАНИТЬ</span>
+                    </button>
+                </form>
+            </section>
+            
+            <!-- РАБОЧИЕ ВЕСА -->
+            <section id="screen-weights" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="showScreen('screen-profile')">←</button>
+                    <h1 class="screen-title">РАБОЧИЕ ВЕСА</h1>
+                </div>
+                
+                <div class="one-rep-max">
+                    <h3 class="section-title">🏆 КАЛЬКУЛЯТОР 1ПМ</h3>
+                    <div class="one-rep-form">
+                        <input type="number" id="one-rep-weight" placeholder="Вес (кг)" class="one-rep-input">
+                        <input type="number" id="one-rep-reps" placeholder="Повторы" class="one-rep-input">
+                        <button class="btn-secondary-small" onclick="calculateOneRepMax()">Рассчитать</button>
+                    </div>
+                    <div class="one-rep-result" id="one-rep-result" style="display: none;">
+                        <span class="one-rep-label">Твой максимум:</span>
+                        <span class="one-rep-value" id="one-rep-value">0 кг</span>
+                    </div>
+                </div>
+                
+                <div class="weights-history">
+                    <h3 class="section-title">📊 ИСТОРИЯ ВЕСОВ</h3>
+                    <div class="weights-list" id="weights-list"></div>
+                </div>
+            </section>
+            
+            <!-- ПИТАНИЕ -->
+            <section id="screen-nutrition" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="showScreen('screen-profile')">←</button>
+                    <h1 class="screen-title">ПИТАНИЕ</h1>
+                </div>
+                
+                <div class="nutrition-goals">
+                    <h3 class="section-title">🎯 ЦЕЛИ НА ДЕНЬ</h3>
+                    <div class="nutrition-grid">
+                        <div class="nutrition-card">
+                            <span class="nutrition-icon">🔥</span>
+                            <span class="nutrition-label">Ккал</span>
+                            <span class="nutrition-value" id="nutrition-calories">0</span>
+                            <span class="nutrition-target">из <span id="nutrition-calories-target">2500</span></span>
+                        </div>
+                        <div class="nutrition-card">
+                            <span class="nutrition-icon">🍗</span>
+                            <span class="nutrition-label">Белки</span>
+                            <span class="nutrition-value" id="nutrition-protein">0</span>
+                            <span class="nutrition-target">из <span id="nutrition-protein-target">150</span>г</span>
+                        </div>
+                        <div class="nutrition-card">
+                            <span class="nutrition-icon">🍞</span>
+                            <span class="nutrition-label">Углеводы</span>
+                            <span class="nutrition-value" id="nutrition-carbs">0</span>
+                            <span class="nutrition-target">из <span id="nutrition-carbs-target">300</span>г</span>
+                        </div>
+                        <div class="nutrition-card">
+                            <span class="nutrition-icon">🥑</span>
+                            <span class="nutrition-label">Жиры</span>
+                            <span class="nutrition-value" id="nutrition-fats">0</span>
+                            <span class="nutrition-target">из <span id="nutrition-fats-target">80</span>г</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="add-food-section">
+                    <h3 class="section-title">➕ ДОБАВИТЬ ПРИЁМ ПИЩИ</h3>
+                    <form class="food-form" onsubmit="addFood(event)">
+                        <input type="text" id="food-name" placeholder="Название продукта" class="food-input" required>
+                        <div class="food-macros">
+                            <input type="number" id="food-protein" placeholder="Белки (г)" class="food-macro-input">
+                            <input type="number" id="food-carbs" placeholder="Углеводы (г)" class="food-macro-input">
+                            <input type="number" id="food-fats" placeholder="Жиры (г)" class="food-macro-input">
+                        </div>
+                        <button type="submit" class="btn-primary-large">
+                            <span>➕ ДОБАВИТЬ</span>
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="meals-section">
+                    <h3 class="section-title">🍽️ СЕГОДНЯ</h3>
+                    <div class="meals-list" id="meals-list"></div>
+                </div>
+            </section>
+            
+            <!-- СОН -->
+            <section id="screen-sleep" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="showScreen('screen-profile')">←</button>
+                    <h1 class="screen-title">СОН</h1>
+                </div>
+                
+                <div class="sleep-tracker">
+                    <div class="sleep-current">
+                        <span class="sleep-label">ПРОШЛАЯ НОЧЬ</span>
+                        <span class="sleep-value" id="sleep-last-hours">--</span>
+                        <span class="sleep-unit">часов</span>
+                    </div>
+                    
+                    <div class="sleep-input-section">
+                        <h3 class="section-title">😴 СКОЛЬКО СПАЛ?</h3>
+                        <div class="sleep-hours-selector">
+                            <button class="sleep-hour-btn" onclick="setSleepHours(5)">5ч</button>
+                            <button class="sleep-hour-btn" onclick="setSleepHours(6)">6ч</button>
+                            <button class="sleep-hour-btn" onclick="setSleepHours(7)">7ч</button>
+                            <button class="sleep-hour-btn" onclick="setSleepHours(8)">8ч</button>
+                            <button class="sleep-hour-btn" onclick="setSleepHours(9)">9ч</button>
+                        </div>
+                        <div class="sleep-quality">
+                            <span class="sleep-quality-label">КАЧЕСТВО СНА:</span>
+                            <div class="quality-stars">
+                                <span class="star" onclick="setSleepQuality(1)">☆</span>
+                                <span class="star" onclick="setSleepQuality(2)">☆</span>
+                                <span class="star" onclick="setSleepQuality(3)">☆</span>
+                                <span class="star" onclick="setSleepQuality(4)">☆</span>
+                                <span class="star" onclick="setSleepQuality(5)">☆</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sleep-history">
+                    <h3 class="section-title">📊 НЕДЕЛЯ</h3>
+                    <div class="sleep-week-grid" id="sleep-week-grid"></div>
+                </div>
+            </section>
+            
+            <!-- ДОСТИЖЕНИЯ -->
+            <section id="screen-achievements" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="showScreen('screen-profile')">←</button>
+                    <h1 class="screen-title">ДОСТИЖЕНИЯ</h1>
+                </div>
+                
+                <div class="achievements-grid-large" id="achievements-grid"></div>
+            </section>
+            
+            <!-- НАСТРОЙКИ -->
+            <section id="screen-settings" class="screen">
+                <div class="screen-header">
+                    <button class="btn-back" onclick="showScreen('screen-profile')">←</button>
+                    <h1 class="screen-title">НАСТРОЙКИ</h1>
+                </div>
+                
+                <div class="settings-list">
+                    <div class="settings-item">
+                        <span class="settings-label">Уведомления</span>
+                        <label class="toggle">
+                            <input type="checkbox" id="setting-notifications" checked onchange="saveSettings()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <span class="settings-label">Звук</span>
+                        <label class="toggle">
+                            <input type="checkbox" id="setting-sound" checked onchange="saveSettings()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <span class="settings-label">Тёмная тема</span>
+                        <label class="toggle">
+                            <input type="checkbox" checked disabled>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button class="btn-danger" onclick="resetAllData()">
+                    <span>🗑️ СБРОСИТЬ ВСЕ ДАННЫЕ</span>
+                </button>
+            </section>
+            
+        </main>
+        
+        <!-- BOTTOM NAVIGATION -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" onclick="showScreen('screen-home')">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Главная</span>
+            </button>
+            <button class="nav-btn" onclick="showScreen('screen-programs')">
+                <span class="nav-icon">🏋️</span>
+                <span class="nav-label">Тренировки</span>
+            </button>
+            <button class="nav-btn" onclick="showScreen('screen-profile')">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Профиль</span>
+            </button>
+        </nav>
+    </div>
+    
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast" id="toast">
+        <span class="toast-icon" id="toast-icon">✓</span>
+        <span class="toast-message" id="toast-message"></span>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
