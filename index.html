@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GOGAGYM — Твой Путь</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="bg-grunge"></div>
+    <div class="bg-particles" id="particles"></div>
+    <div class="bg-vignette"></div>
+    
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-text">GOGA</span><span class="logo-text-red">GYM</span>
+            </div>
+            <div class="user-info">
+                <span id="user-name">ВОИН</span>
+            </div>
+        </header>
+        
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            
+            <!-- ГЛАВНАЯ -->
+            <section id="screen-home" class="screen active">
+                <div class="welcome-block">
+                    <h1 class="welcome-title">GOGAGYM</h1>
+                    <p class="welcome-subtitle">ТВОЙ ПУТЬ ВОИНА</p>
+                </div>
+                
+                <!-- Быстрая статистика -->
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <span class="stat-value" id="stat-workouts">0</span>
+                        <span class="stat-label">ТРЕНИРОВОК</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="stat-calories">0</span>
+                        <span class="stat-label">КАЛОРИЙ</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="stat-streak">0</span>
+                        <span class="stat-label">ДНЕЙ ПОДРЯД</span>
+                    </div>
+                </div>
+                
+                <!-- Достижения -->
+                <div class="achievements-preview" id="achievements-preview">
+                    <h3 class="section-title">🏆 ДОСТИЖЕНИЯ</h3>
+                    <div class="achievements-grid" id="achievements-grid"></div>
+                </div>
+                
+                <!-- Кнопки -->
+                <div class="action-buttons">
+                    <button class="btn btn-primary btn-large" onclick="showScreen('screen-workout')">
+                        <span class="btn-icon">🔥</span>
+                        <span>НАЧАТЬ ТРЕНИРОВКУ</span>
+                    </button>
+                    <div class="btn-row">
+                        <button class="btn btn-secondary" onclick="showScreen('screen-progress')">
+                            <span>📊</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="showScreen('screen-goals')">
+                            <span>🎯</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="showScreen('screen-water')">
+                            <span>💧</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="showScreen('screen-more')">
+                            <span>⚡</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ТРЕНИРОВКА -->
+            <section id="screen-workout" class="screen">
+                <div class="workout-header">
+                    <button class="btn-back" onclick="showScreen('screen-home')">←</button>
+                    <h2 class="screen-title">ПРОТОКОЛ <span id="protocol-num">#047</span></h2>
+                </div>
+                
+                <div class="workout-info">
+                    <div class="workout-timer">
+                        <span class="timer-label">ВРЕМЯ РАУНДА</span>
+                        <span class="timer-value" id="round-timer">45</span>
+                        <span class="timer-unit">сек</span>
+                    </div>
+                    <div class="round-indicator">
+                        <span>РАУНД</span>
+                        <span class="round-current" id="round-current">1</span>
+                        <span>/</span>
+                        <span class="round-total" id="round-total">5</span>
+                    </div>
+                </div>
+                
+                <div class="exercise-card">
+                    <div class="exercise-gif">
+                        <span class="exercise-icon" id="exercise-icon">🤸</span>
+                    </div>
+                    <h3 class="exercise-name" id="exercise-name">БЁРПИ</h3>
+                    <p class="exercise-sets" id="exercise-sets">4 подхода × 15 повторений</p>
+                </div>
+                
+                <div class="workout-controls">
+                    <button class="btn btn-danger btn-large" onclick="completeSet()">
+                        <span>✅ УНИЧТОЖЕНО</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="skipExercise()">
+                        <span>⏭️ ПРОПУСТИТЬ</span>
+                    </button>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="workout-progress-fill" style="width: 20%"></div>
+                </div>
+            </section>
+            
+            <!-- ПРОГРЕСС -->
+            <section id="screen-progress" class="screen">
+                <div class="workout-header">
+                    <button class="btn-back" onclick="showScreen('screen-home')">←</button>
+                    <h2 class="screen-title">СТАТИСТИКА БОЙЦА</h2>
+                </div>
+                
+                <div class="measurements-grid">
+                    <div class="measurement-card">
+                        <span class="measurement-label">ВЕС</span>
+                        <span class="measurement-value" id="measure-weight">--</span>
+                        <span class="measurement-unit">кг</span>
+                    </div>
+                    <div class="measurement-card">
+                        <span class="measurement-label">ГРУДЬ</span>
+                        <span class="measurement-value" id="measure-chest">--</span>
+                        <span class="measurement-unit">см</span>
+                    </div>
+                    <div class="measurement-card">
+                        <span class="measurement-label">ТАЛИЯ</span>
+                        <span class="measurement-value" id="measure-waist">--</span>
+                        <span class="measurement-unit">см</span>
+                    </div>
+                    <div class="measurement-card">
+                        <span class="measurement-label">БЁДРА</span>
+                        <span class="measurement-value" id="measure-hips">--</span>
+                        <span class="measurement-unit">см</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="showScreen('screen-add-progress')">
+                    <span>📝 ЗАПИСАТЬ ДАННЫЕ</span>
+                </button>
+                
+                <div class="history-section">
+                    <h3 class="section-title">📅 ИСТОРИЯ ЗАМЕРОВ</h3>
+                    <div class="history-list" id="progress-history"></div>
+                </div>
+                
+                <div class="calendar-container">
+                    <h3 class="section-title">📆 КАЛЕНДАРЬ ТРЕНИРОВОК</h3>
+                    <div class="calendar-grid" id="calendar-grid"></div>
+                </div>
+            </section>
+            
+            <!-- ДОБАВИТЬ ПРОГРЕСС -->
+            <section id="screen-add-progress" class="screen">
+                <div class="workout-header">
+                    <button class="btn-back" onclick="showScreen('screen-progress')">←</button>
+                    <h2 class="screen-title">НОВЫЕ ДАННЫЕ</h2>
+                </div>
+                
+                <form class="progress-form" id="progress-form" onsubmit="saveProgress(event)">
+                    <div class="form-group">
+                        <label>⚖️ ВЕС (кг)</label>
+                        <input type="number" step="0.1" id="input-weight" placeholder="75.5">
+                    </div>
+                    <div class="form-group">
+                        <label>📏 ГРУДЬ (см)</label>
+                        <input type="number" step="0.1" id="input-chest" placeholder="100">
+                    </div>
+                    <div class="form-group">
+                        <label>📏 ТАЛИЯ (см)</label>
+                        <input type="number" step="0.1" id="input-waist" placeholder="80">
+                    </div>
+                    <div class="form-group">
+                        <label>📏 БЁДРА (см)</label>
+                        <input type="number" step="0.1" id="input-hips" placeholder="95">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-large">
+                        <span>💾 СОХРАНИТЬ</span>
+                    </button>
+                </form>
+            </section>
+            
+            <!-- ЦЕЛИ -->
+            <section id="screen-goals" class="screen">
+                <div class="workout-header">
+                    <button class="btn-back" onclick="showScreen('screen-home')">←</button>
+                    <h2 class="screen-title">МОИ ЦЕЛИ</h2>
+                </div>
+                
+                <div class="goal-selector">
+                    <h3 class="section-title">ГЛАВНАЯ ЦЕЛЬ</h3>
+                    <div class="goal-options">
+                        <button class="goal-option" data-goal="burn" onclick="setGoal('burn')">
+                            <span class="goal-icon">🔥</span>
+                            <span>СЖИГАНИЕ ЖИРА</span>
+                        </button>
+                        <button class="goal-option" data-goal="gain" onclick="setGoal('gain')">
+                            <span class="goal-icon">💪</span>
+                            <span>НАБОР МАССЫ</span>
+                        </button>
+                        <button class="goal-option" data-goal="endurance" onclick="setGoal('endurance')">
+                            <span class="goal-icon">⚡</span>
+                            <span>ВЫНОСЛИВОСТЬ</span>
+                        </button>
+                        <button class="goal-option" data-goal="strength" onclick="setGoal('strength')">
+                            <span class="goal-icon">🏋️</span>
+                            <span>СИЛА</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="goal-current">
+                    <h3 class="section-title">ТЕКУЩАЯ ЦЕЛЬ</h3>
+                    <div class="goal-display" id="goal-display">
+                        <span class="goal-display-icon" id="goal-display-icon">❓</span>
+                        <span class="goal-display-text" id="goal-display-text">Не выбрана</span>
+                    </div>
+                </div>
+                
+                <div class="checklist-section">
+                    <h3 class="section-title">📋 ЧЕК-ЛИСТ НА ДЕНЬ</h3>
+                    <div class="checklist" id="checklist">
+                        <div class="checklist-item" onclick="toggleCheck(this)">
+                            <span class="checkmark">☐</span>
+                            <span>Тренировка</span>
+                        </div>
+                        <div class="checklist-item" onclick="toggleCheck(this)">
+                            <span class="checkmark">☐</span>
+                            <span>2л воды</span>
+                        </div>
+                        <div class="checklist-item" onclick="toggleCheck(this)">
+                            <span class="checkmark">☐</span>
+                            <span>Белок в каждом приёме пищи</span>
+                        </div>
+                        <div class="checklist-item" onclick="toggleCheck(this)">
+                            <span class="checkmark">☐</span>
+                            <span>8 часов сна</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ВОДА -->
+            <section id="screen-water" class="screen">
+                <div class="workout-header">
+                    <button class="btn-back" onclick="showScreen('screen-home')">←</button>
+                    <h2 class="screen-title">ТРЕКЕР ВОДЫ</h2>
+                </div>
+                
+                <div class="water-container">
+                    <div class="water-goal">
+                        <span class="water-label">ЦЕЛЬ НА ДЕНЬ</span>
+                        <span class="water-value"><span id="water-current">0</span> / <span id="water-goal">2000</span> мл</span>
+                    </div>
+                    
+                    <div class="water-visual">
+                        <div class="water-bottle">
+                            <div class="water-fill" id="water-fill" style="height: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="water-controls">
+                        <button class="btn btn-secondary" onclick="addWater(-250)">
+                            <span>-250 мл</span>
+                        </button>
+                        <button class="btn btn-primary" onclick="addWater(250)">
+                            <span>💧 +250 мл</span>
+                        </button>
+                        <button class="btn btn-primary" onclick="addWater(500)">
+                            <span>🥤 +500 мл</span>
+                        </button>
+                    </div>
+                    
+                    <button class="btn btn-secondary" onclick="resetWater()">
+                        <span>🔄 СБРОСИТЬ</span>
+                    </button>
+                </div>
+            </section>
+            
+            <!-- ЕЩЁ (калькулятор, упражнения, заметки) -->
+            <section id="screen-more" class="screen">
+                <div class="workout-header">
+                    <button class="btn-back" onclick="showScreen('screen-home')">←</button>
+                    <h2 class="screen-title">ЕЩЁ</h2>
+                </div>
+                
+                <div class="more-grid">
+                    <button class="more-card" onclick="showScreen('screen-calculator')">
+                        <span class="more-icon">🧮</span>
+                        <span class="more-title">КАЛЬКУЛЯТОР КАЛОРИЙ</span>
+                        <span class="more-desc">Расчёт нормы калорий</span>
+                    </button>
+                    
+                    <button class="more-card" onclick="showScreen('screen-exercises')">
+                        <span class="more-icon">🏋️</span>
+                        <span class="more-title">УПРАЖНЕНИЯ</span>
+                        <span class="more-desc">База упражнений</span>
+                    </button>
+                    
+                    <button class="more-card" onclick="showScreen('screen-notes')">
+                        <span class="more-icon">📝</span>
+                        <span class="more-title">ЗАМЕТКИ</span>
+                        <span class="more-desc">Личные записи</span>
+                    </button>
+                    
+                    <button class="more-card" onclick="showScreen('screen-history')">
+                        <span class="more-icon">📊</span>
+                        <span class="more-title">ИСТОРИЯ</span>
+                        <span class="more-desc">Все тренировки</span>
+                    </button>
+                </div>
+            </section>
+            
+            <!-- КАЛЬКУЛЯТОР -->
+            <section id="screen-calculator" class="screen">
+                <div class="workout-header">
+                    <button class="btn-back" onclick="showScreen('screen-more')">←</button>
+                    <h2 class="screen-title">КАЛЬКУЛЯТОР КАЛОРИЙ</h2>
+                </div>
+                
+                <form class="calc-form" onsubmit="calculateCalories(event)">
+                    <div class="form-group">
+                        <label>ПОЛ</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="gender" value="male" checked> Мужской
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="gender" value="female"> Женский
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>ВЕС (кг)</label>
+                        <input type="number" id="calc-weight" placeholder="75" required>
+                    </div>
+                    <div class="form-group">
+                        <label>РОСТ (см)</label>
+                        <input type="number" id="calc-height" placeholder="175" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ВОЗРАСТ (лет)</label>
+                        <input type="number" id="calc-age" placeholder="25" required>
+                    </div>
+                    <div class="form-group">
+                        <label>АКТИВНОСТЬ</label>
+                        <select id="calc-activity">
+                            <option value="1.2">Минимальная (сидячая работа)</option>
+                            <option value="1.375">Лёгкая (1-3 тренировки)</option>
+                            <option value="1.55">Средняя (3-5 тренировок)</option>
+                            <option value="1.725">Высокая (6-7 тренировок)</option>
+                            <option value="1.9">Экстремальная (2 раза в день)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-large">
+                        <span>🧮 РАССЧИТАТЬ</span>
+                    </button>
+                </form>
+                
+                <div class="calc-result" id="calc-result" style="display: none;">
+                    <div class="result-card">
+                        <span class="result-label">БАЗОВЫЙ ОБМЕН</span>
+                        <span class="result-value" id="result-bmr">0</span>
+                        <span class="result-unit">ккал/день</span>
+                    </div>
+                    <div class="result-card">
+                        <span class="result-label">НОРМА (поддержание)</span>
+                        <span class="result-value" id="result-tdee">0</span>
+                        <span class="result-unit">ккал/день</span>
+                    </div>
+                    <div class="result-card highlight">
+                        <span class="result-label">ДЕФИЦИТ (-15%)</span>
+                        <span class="result-value" id="result-deficit">0</span>
+                        <span class="result-unit">ккал/день</span>
+                    </div>
+                    <div class="result-card highlight">
+                        <span class="result-label">ПРОФИЦИТ (+15%)</span>
+                        <span class="result-value" id="result-surplus">0</span>
+                        <span class="result-unit">ккал/день</span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- УПРАЖНЕНИЯ -->
+            <section id="screen-exercises" class="screen">
+                <div class="workout-header">
+                    <button class="btn-back" onclick="showScreen('screen-more')">←</button>
+                    <h2 class="screen-title">БАЗА УПРАЖНЕНИЙ</h2>
+                </div>
+                
+                <div class="exercises-list" id="exercises-list"></div>
+            </section>
+            
+            <!-- ЗАМЕТКИ -->
+            <section id="screen-notes" class="screen">
+                <div class="workout-header">
+                    <button class="btn-back" onclick="showScreen('screen-more')">←</button>
+                    <h2 class="screen-title">ЗАМЕТКИ</h2>
+                </div>
+                
+                <div class="notes-container">
+                    <textarea id="notes-text" class="notes-textarea" placeholder="Пиши сюда свои мысли, советы, наблюдения..."></textarea>
+                    <button class="btn btn-primary" onclick="saveNotes()">
+                        <span>💾 СОХРАНИТЬ</span>
+                    </button>
+                    <div class="notes-saved" id="notes-saved" style="display: none;">
+                        ✅ Сохранено!
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ИСТОРИЯ ТРЕНИРОВОК -->
+            <section id="screen-history" class="screen">
+                <div class="workout-header">
+                    <button class="btn-back" onclick="showScreen('screen-more')">←</button>
+                    <h2 class="screen-title">ИСТОРИЯ ТРЕНИРОВОК</h2>
+                </div>
+                
+                <div class="history-list" id="workout-history"></div>
+            </section>
+            
+        </main>
+        
+        <!-- BOTTOM NAV -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" onclick="showScreen('screen-home')">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">ГЛАВНАЯ</span>
+            </button>
+            <button class="nav-btn" onclick="showScreen('screen-workout')">
+                <span class="nav-icon">🔥</span>
+                <span class="nav-label">ТРЕНИРОВКА</span>
+            </button>
+            <button class="nav-btn" onclick="showScreen('screen-progress')">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">ПРОГРЕСС</span>
+            </button>
+            <button class="nav-btn" onclick="showScreen('screen-more')">
+                <span class="nav-icon">⚡</span>
+                <span class="nav-label">ЕЩЁ</span>
+            </button>
+        </nav>
+    </div>
+    
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+        <span class="toast-message" id="toast-message"></span>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
