@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOGAGYM — Сертификаты</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --bg-card: #0a0a0a;
+            --primary-red: #ff0033;
+            --text-primary: #ffffff;
+            --text-secondary: #666666;
+            --border-color: #1a1a1a;
+            --glow-color: rgba(255, 0, 51, 0.5);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Orbitron', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-family: 'Metal Mania', cursive;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .logo-red { color: var(--primary-red); text-shadow: 0 0 20px var(--glow-color); }
+        
+        .progress-banner {
+            background: var(--bg-card);
+            border: 1px solid var(--primary-red);
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .progress-text {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #1a1a1a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #cc0022, #ff0033);
+            box-shadow: 0 0 10px var(--glow-color);
+        }
+        
+        .certs-grid {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .cert-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-red);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        
+        .cert-card:hover {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+        
+        .cert-card.locked {
+            opacity: 0.4;
+            border-left-color: #333;
+        }
+        
+        .cert-card.completed {
+            border-left-color: #00ff00;
+        }
+        
+        .cert-name {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .cert-issuer {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+        
+        .cert-status {
+            font-size: 24px;
+        }
+        
+        .btn-download {
+            background: var(--primary-red);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .btn-download:hover {
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">GOGA<span class="logo-red">GYM</span></div>
+        <p style="color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px;">Досье Квалификации</p>
+    </div>
+    
+    <div class="progress-banner">
+        <div class="progress-text">
+            <span>ПУТЬ ВОИНА:</span>
+            <span style="color: var(--primary-red); font-weight: 700;" id="progress-value">3/9</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 33%"></div>
+        </div>
+    </div>
+    
+    <div class="certs-grid" id="certs-grid"></div>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+        
+        const certificates = [
+            { name: 'Анатомия для тренера', issuer: 'Evotren', status: 'completed', date: '2024-01-15' },
+            { name: 'Нутрициология', issuer: 'Evotren', status: 'completed', date: '2024-02-20' },
+            { name: 'Функциональный тренинг', issuer: 'Evotren', status: 'in_progress' },
+            { name: 'Биомеханика движений', issuer: 'Evotren', status: 'locked' },
+            { name: 'Периодизация тренировок', issuer: 'Evotren', status: 'locked' },
+            { name: 'Реабилитация и восстановление', issuer: 'Evotren', status: 'locked' },
+            { name: 'Спортивная физиология', issuer: 'Evotren', status: 'locked' },
+            { name: 'Психология мотивации', issuer: 'Evotren', status: 'locked' },
+            { name: 'Элитный тренер', issuer: 'Evotren', status: 'locked' }
+        ];
+        
+        const statusIcons = { completed: '✅', in_progress: '🔄', locked: '🔒' };
+        
+        const grid = document.getElementById('certs-grid');
+        let completed = 0;
+        
+        certificates.forEach(cert => {
+            if (cert.status === 'completed') completed++;
+            
+            const card = document.createElement('div');
+            card.className = `cert-card ${cert.status}`;
+            card.innerHTML = `
+                <div>
+                    <div class="cert-name">${cert.name}</div>
+                    <div class="cert-issuer">${cert.issuer}${cert.date ? ' · ' + cert.date : ''}</div>
+                    ${cert.status === 'completed' ? '<button class="btn-download" onclick="downloadCert(\'' + cert.name + '\')">📥 Скачать PDF</button>' : ''}
+                </div>
+                <div class="cert-status">${statusIcons[cert.status]}</div>
+            `;
+            grid.appendChild(card);
+        });
+        
+        document.getElementById('progress-value').textContent = `${completed}/${certificates.length}`;
+        document.getElementById('progress-fill').style.width = `${completed / certificates.length * 100}%`;
+        
+        function downloadCert(name) {
+            Telegram.WebApp.showAlert('📥 ' + name + '\n\nСертификат готовится к скачиванию...');
+        }
+    </script>
+</body>
+</html>
